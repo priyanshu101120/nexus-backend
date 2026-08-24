@@ -13,4 +13,25 @@ export const projectController = {
       next(error);
     }
   },
+
+  async list(req: Request, res: Response, next: NextFunction) {
+    try {
+      const workspaceId = req.workspaceId!;
+      const projects = await projectServices.list(workspaceId);
+      res.status(200).json({ projects });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const workspaceId = req.workspaceId!;
+      const { projectId } = req.params;
+      const project = await projectServices.getById(projectId, workspaceId);
+      res.status(200).json({ project });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
