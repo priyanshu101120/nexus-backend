@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  refreshToken String?  @map("refresh_token")
+
+  workspaceMemberships WorkspaceMember[]
+  assignedTasks        Task[]            @relation("TaskAssignee")
+  comments             Comment[]
+  activities           Activity[]
+  notifications        Notification[]
+  invitationsSent      Invitation[]      @relation("InvitationSender")
+}
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members     WorkspaceMember[]
+  projects    Project[]
+  invitations Invitation[]
+}
+
+model WorkspaceMember {
+  id       String        @id @default(cuid())
+  role     WorkspaceRole @default(MEMBER)
+  joinedAt DateTime      @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  color       String?
+  startDate   DateTime?
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  board      Board?
+  activities Activity[]
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  projectId String  @unique
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  columns Column[]
+}
+
+model Column {
+  id    String @id @default(cuid())
+  name  String
+  order Int
+
+  boardId String
+  board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  priority    TaskPriority @default(MEDIUM)
+  order       Int
+  dueDate     DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  columnId String
+  column   Column @relation(fields: [columnId], references: [id], onDelete: Cascade)
+
+  assigneeId String?
+  assignee   User?   @relation("TaskAssignee", fields: [assigneeId], references: [id])
+
+  comments Comment[]
+  labels   Label[]
+}
+
+model Label {
+  id    String  @id @default(cuid())
+  name  String
+  color String?
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  action    String
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Invitation {
+  id        String        @id @default(cuid())
+  email     String
+  role      WorkspaceRole @default(MEMBER)
+  token     String        @unique
+  accepted  Boolean       @default(false)
+  createdAt DateTime      @default(now())
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  invitedById String
+  invitedBy   User   @relation("InvitationSender", fields: [invitedById], references: [id])
+}
