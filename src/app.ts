@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { env } from "./config/env";
 import routes from "./routes";
-import { errorHandler } from "./middleware/error.middleware";
+import { errorMiddleware, notFoundMiddleware } from "./middleware/error.middleware";
 
 const app = express();
 
@@ -17,6 +17,9 @@ app.get("/health", (_req, res) => {
 
 app.use("/api", routes);
 
-app.use(errorHandler);
+// Order matters: notFound catches anything no route matched,
+// errorMiddleware catches everything thrown/passed to next().
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
 
 export default app;

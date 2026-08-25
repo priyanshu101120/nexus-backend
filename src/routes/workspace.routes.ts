@@ -2,7 +2,7 @@ import { Router } from "express";
 import { requireAuth } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate.middleware";
 import { createWorkspaceSchema } from "../validators/workspace.validator";
-import { workspaceController } from "../controllers/workspace.controlller";
+import { workspaceController } from "../controllers/workspace.controller";
 
 const router = Router();
 
