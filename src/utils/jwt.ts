@@ -1,4 +1,4 @@
-import Jwt from "jsonwebtoken";
+import Jwt, { SignOptions } from "jsonwebtoken";
 
 // What YOU provide when signing a token
 export interface JwtSignPayload {
@@ -18,13 +18,13 @@ const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
 
 export function signAccessToken(payload: JwtSignPayload): string {
   return Jwt.sign(payload, ACCESS_SECRET, {
-    expiresIn: process.env.JWT_ACCESS_EXPIRY || "1d",
+    expiresIn: (process.env.JWT_ACCESS_EXPIRY || "1d") as SignOptions["expiresIn"],
   });
 }
 
 export function signRefreshToken(payload: JwtSignPayload): string {
   return Jwt.sign(payload, REFRESH_SECRET, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRY || "7d",
+    expiresIn: (process.env.JWT_REFRESH_EXPIRY || "7d") as SignOptions["expiresIn"],
   });
 }
 
