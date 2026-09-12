@@ -29,5 +29,10 @@ router.patch(
   taskController.move,
 );
 router.delete("/tasks/:taskId", taskController.remove);
+router.get("/", taskController.listByWorkspace);
+router.get(
+  "/:taskId",
+  taskController.getByIdInWorkspace
+);
 
 export default router;

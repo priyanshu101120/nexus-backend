@@ -41,4 +41,28 @@ export const taskController = {
       next(error);
     }
   },
+
+  // NEW: GET /workspace/:slug/tasks — all tasks across every project
+  async listByWorkspace(req: Request, res: Response, next: NextFunction) {
+    try {
+      const workspaceId = req.workspaceId!;
+      const tasks = await taskService.listByWorkspace(workspaceId);
+      res.status(200).json({ tasks });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async getByIdInWorkspace(req: Request, res: Response) {
+  const { slug, taskId } = req.params;
+
+  const task = await taskService.getByIdInWorkspace(
+    slug,
+    taskId
+  );
+
+  res.status(200).json({
+    task,
+  });
+}
 };

@@ -8,6 +8,7 @@ import {
   topLevelInvitationRouter,
   workspaceInvitationRouter,
 } from "./invitation.routes";
+import notificationRoutes from "./notification.routes";
 
 const router = Router();
 
@@ -15,7 +16,9 @@ router.use("/auth", authRoutes);
 router.use("/workspace", workspaceRoutes);
 router.use("/workspace/:slug/projects", projectRoutes);
 router.use("/workspace/:slug/projects/:projectId", taskRoutes);
-router.use("/workspaces/:slug/members", memberRoutes);
-router.use("/workspaces/:slug/invitations", workspaceInvitationRouter);
+router.use("/workspace/:slug/tasks", taskRoutes);
+router.use("/workspace/:slug/members", memberRoutes);
+router.use("/workspace/:slug/invitations", workspaceInvitationRouter);
 router.use("/invitations", topLevelInvitationRouter);
+router.use("/notifications", notificationRoutes);
 export default router;

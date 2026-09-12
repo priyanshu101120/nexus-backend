@@ -45,6 +45,37 @@ export const taskRepository = {
       },
     });
   },
+
+  // NEW: all tasks across every project in a workspace — Task has no direct
+  // workspaceId FK, so this filters through the column -> board -> project
+  // relation chain instead.
+  async findAllInWorkspace(workspaceId: string) {
+    return prisma.task.findMany({
+      where: {
+        column: {
+          board: {
+            project: { workspaceId },
+          },
+        },
+      },
+      include: {
+        assignee: { select: { id: true, name: true, avatarUrl: true } },
+        column: {
+          select: {
+            id: true,
+            name: true,
+            board: {
+              select: {
+                project: { select: { id: true, name: true } },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  },
+
   async update(taskId: string, data: Record<string, any>) {
     return prisma.task.update({
       where: { id: taskId },
@@ -74,4 +105,42 @@ export const taskRepository = {
       include: { board: { include: { project: true } } },
     });
   },
+
+  async findByIdInWorkspace(slug: string, taskId: string) {
+  return prisma.task.findFirst({
+    where: {
+      id: taskId,
+      column: {
+        board: {
+          project: {
+            workspace: {
+              slug,
+            },
+          },
+        },
+      },
+    },
+    include: {
+      column: {
+        include: {
+          board: {
+            include: {
+              project: true,
+            },
+          },
+        },
+      },
+      assignee: true,
+      comments: {
+        include: {
+          user: true,
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+      labels: true,
+    },
+  });
+}
 };

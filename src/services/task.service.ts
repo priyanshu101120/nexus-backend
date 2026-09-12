@@ -39,4 +39,19 @@ export const taskService = {
     await this.assertTaskBelongsToProject(taskId, projectId);
     await taskRepository.delete(taskId);
   },
+
+  // NEW: flat "all tasks in this workspace" — used by the workspace-level
+  // Tasks page (not scoped to any single project).
+  async listByWorkspace(workspaceId: string) {
+    return taskRepository.findAllInWorkspace(workspaceId);
+  },
+  async getByIdInWorkspace(slug: string, taskId: string) {
+    const task = await taskRepository.findByIdInWorkspace(slug, taskId);
+
+    if (!task) {
+      throw new ApiError(404, "Task not found");
+    }
+
+    return task;
+  },
 };

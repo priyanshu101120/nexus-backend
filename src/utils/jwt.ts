@@ -18,7 +18,7 @@ const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
 
 export function signAccessToken(payload: JwtSignPayload): string {
   return Jwt.sign(payload, ACCESS_SECRET, {
-    expiresIn: process.env.JWT_ACCESS_EXPIRY || "15m",
+    expiresIn: process.env.JWT_ACCESS_EXPIRY || "1d",
   });
 }
 

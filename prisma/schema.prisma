@@ -19,6 +19,11 @@ enum TaskPriority {
   HIGH
 }
 
+enum NotificationType {
+  INVITATION
+  GENERAL
+}
+
 model User {
   id           String   @id @default(cuid())
   name         String
@@ -155,13 +160,20 @@ model Activity {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
-  message   String
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id           String           @id @default(cuid())
+  message      String
+  type         NotificationType @default(GENERAL)
+  read         Boolean          @default(false)
+  createdAt    DateTime         @default(now())
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  invitationId String?
+  invitation   Invitation?      @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }
 
 model Invitation {
@@ -177,4 +189,6 @@ model Invitation {
 
   invitedById String
   invitedBy   User   @relation("InvitationSender", fields: [invitedById], references: [id])
+
+  notifications Notification[]
 }

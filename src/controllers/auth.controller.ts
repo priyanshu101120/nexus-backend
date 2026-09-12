@@ -46,7 +46,7 @@ export const authController = {
     try {
       const userId = req.user?.userId;
 
-      if (!userId) {
+      if (userId) {
         await authService.logout(userId);
       }
       clearAuthCookies(res);
