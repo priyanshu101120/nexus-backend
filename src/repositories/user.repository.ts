@@ -28,6 +28,35 @@ export const userRepository = {
     });
   },
 
+  findByGoogleId(googleId: string) {
+    return prisma.user.findUnique({ where: { googleId } });
+  },
+
+  
+  createFromGoogle(data: {
+    name: string;
+    email: string;
+    googleId: string;
+    avatarUrl?: string;
+  }) {
+    return prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        googleId: data.googleId,
+        avatarUrl: data.avatarUrl,
+      },
+    });
+  },
+
+
+  attachGoogleId(userId: string, googleId: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: { googleId },
+    });
+  },
+
   updateRefreshToken(id: string, refreshToken: string | null) {
     return prisma.user.update({ where: { id }, data: { refreshToken } });
   },

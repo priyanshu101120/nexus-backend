@@ -25,14 +25,15 @@ enum NotificationType {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  avatarUrl    String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  refreshToken String?  @map("refresh_token")
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  passwordHash  String?              
+  googleId      String?  @unique     
+  avatarUrl     String?
+  refreshToken  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   workspaceMemberships WorkspaceMember[]
   assignedTasks        Task[]            @relation("TaskAssignee")
@@ -41,6 +42,8 @@ model User {
   notifications        Notification[]
   invitationsSent      Invitation[]      @relation("InvitationSender")
 }
+
+
 
 model Workspace {
   id        String   @id @default(cuid())
