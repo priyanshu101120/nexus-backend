@@ -7,8 +7,8 @@ export const authController = {
   async register(req: Request, res: Response, next: NextFunction) {
     try {
       const { user, accessToken, refreshToken } = await authService.register(req.body);
-      setAuthCookies(res, accessToken, refreshToken);
-      res.status(201).json({ message: "Registered successfully", user });
+      setAuthCookies(res,refreshToken);
+      res.status(201).json({ message: "Registered successfully", user, accessToken });
     } catch (error) {
       next(error);
     }
@@ -17,8 +17,8 @@ export const authController = {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { user, accessToken, refreshToken } = await authService.login(req.body);
-      setAuthCookies(res, accessToken, refreshToken);
-      res.status(200).json({ message: "Logged in successfully", user });
+      setAuthCookies(res,refreshToken);
+      res.status(200).json({ message: "Logged in successfully", user, accessToken });
     } catch (error) {
       next(error);
     }
@@ -29,8 +29,8 @@ export const authController = {
     try {
       const { idToken } = req.body;
       const { user, accessToken, refreshToken } = await authService.googleLogin(idToken);
-      setAuthCookies(res, accessToken, refreshToken);
-      res.status(200).json({ message: "Logged in with Google successfully", user });
+      setAuthCookies(res,refreshToken);
+      res.status(200).json({ message: "Logged in with Google successfully", user, accessToken });
     } catch (error) {
       next(error);
     }
@@ -42,8 +42,8 @@ export const authController = {
       if (!incomingToken) throw new ApiError(401, "No refresh token provided");
 
       const { user, accessToken, refreshToken } = await authService.refresh(incomingToken);
-      setAuthCookies(res, accessToken, refreshToken);
-      res.status(200).json({ message: "Token refreshed successfully", user });
+      setAuthCookies(res,refreshToken);
+      res.status(200).json({ message: "Token refreshed successfully", user, accessToken });
     } catch (error) {
       next(error);
     }
